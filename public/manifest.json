@@ -1,0 +1,52 @@
+{
+  "name": "SimchaLink - ניהול אירועים",
+  "short_name": "SimchaLink",
+  "description": "פלטפורמה חכמה לניהול חתונות ואירועים",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#dc9229",
+  "orientation": "portrait-primary",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-dashboard.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "לוח בקרה ראשי"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "הוסף מוזמן",
+      "short_name": "מוזמן",
+      "description": "הוספת מוזמן חדש",
+      "url": "/dashboard/guests",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "לוח בקרה",
+      "short_name": "בקרה",
+      "description": "לוח בקרה ראשי",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
