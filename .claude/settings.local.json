@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p=JSON.parse\\(require\\(''''fs''''\\).readFileSync\\(''''c:/Users/seanp/Downloads/wedding-app/wedding-app/node_modules/@supabase/supabase-js/package.json'''',''''utf8''''\\)\\);console.log\\(JSON.stringify\\(p.exports,null,2\\)\\)\")",
+      "Bash(npm run:*)",
+      "Bash(find /c/Users/seanp/Downloads/wedding-app/wedding-app -type f -name *.test.ts -o -name *.spec.ts -o -name *.test.js -o -name *.spec.js -o -name jest.config.* -o -name vitest.config.*)",
+      "Bash(npm install:*)",
+      "Bash(grep -rn \"from ''''recharts''''\\\\|from ''''html2canvas''''\\\\|from ''''jspdf''''\" app/ --include=\"*.tsx\")",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}

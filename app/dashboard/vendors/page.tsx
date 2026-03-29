@@ -219,10 +219,10 @@ function VendorCard({ vendor, eventId, onAddExpense }: { vendor: Vendor; eventId
       </div>
 
       {/* Rating */}
-      {vendor.rating > 0 && (
+      {(vendor.rating ?? 0) > 0 && (
         <div className="flex items-center gap-1 mb-2">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(vendor.rating) ? 'fill-champagne-400 text-champagne-400' : 'text-stone-200'}`} />
+            <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(vendor.rating ?? 0) ? 'fill-champagne-400 text-champagne-400' : 'text-stone-200'}`} />
           ))}
           <span className="text-xs text-stone-500 font-hebrew mr-1">{vendor.rating} ({vendor.review_count} ביקורות)</span>
         </div>

@@ -43,11 +43,11 @@ function WhatsAppDemo() {
           {/* WhatsApp header */}
           <div className="bg-[#075e54] pt-8 pb-3 px-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-champagne-300 flex items-center justify-center text-sm font-bold text-dark-brown">
-              יע
+              ל&נ
             </div>
             <div>
-              <p className="text-white font-semibold text-sm">יעל & אורי 💍</p>
-              <p className="text-green-200 text-xs">אירוע 12.08.2025</p>
+              <p className="text-white font-semibold text-sm">ליאת & נתנאל 💍</p>
+              <p className="text-green-200 text-xs">אירוע 27.02.2026</p>
             </div>
           </div>
 
@@ -64,13 +64,13 @@ function WhatsAppDemo() {
                 <div className="wa-bubble-out p-3 max-w-56 text-xs shadow-sm">
                   <p className="font-bold text-[#075e54] text-right mb-1">💌 הזמנה לחתונה</p>
                   <p className="text-right leading-relaxed text-gray-800">
-                    שלום דני! 🌹<br/>
+                    שלום מיכאל! 🌹<br/>
                     אנו שמחים להזמינך לחתונתנו
                   </p>
                   <div className="bg-white/60 rounded-lg p-2 mt-2 text-center">
-                    <p className="font-bold text-[#075e54]">יעל & אורי</p>
-                    <p className="text-gray-600">📅 12.08.2025 | 19:00</p>
-                    <p className="text-gray-600">📍 אולם הגן הסגור</p>
+                    <p className="font-bold text-[#075e54]">ליאת & נתנאל</p>
+                    <p className="text-gray-600">📅 27.02.2026 | 19:00</p>
+                    <p className="text-gray-600">📍 אולם Ray</p>
                   </div>
                   <div className="flex gap-1 mt-2">
                     <button className="flex-1 bg-[#25d366] text-white rounded-lg py-1 text-xs font-bold">✅ אגיע</button>
@@ -87,7 +87,7 @@ function WhatsAppDemo() {
                 <div className="wa-bubble-out p-2 max-w-48 text-xs shadow-sm">
                   <div className="bg-white rounded-lg p-2 border-r-4 border-[#25d366]">
                     <p className="font-bold text-xs text-gray-700">🌐 אתר האירוע</p>
-                    <p className="text-[#075e54] text-xs">simchalink.app/yaelori</p>
+                    <p className="text-[#075e54] text-xs">MarryME.app/LiatNetanel</p>
                     <p className="text-gray-500 text-xs">ניווט • מתנות • ברכות</p>
                   </div>
                   <p className="text-gray-400 text-right text-xs mt-1">15:32 ✓✓</p>
@@ -123,7 +123,7 @@ function WhatsAppDemo() {
               <div className="flex justify-center" style={{ animation: 'fadeIn 0.5s ease-out' }}>
                 <div className="bg-[#e7f8ee] border border-[#25d366]/30 rounded-full px-3 py-1 text-xs text-[#128c7e] flex items-center gap-1">
                   <Check className="w-3 h-3" />
-                  <span>דני כהן אישר הגעה! המערכת עודכנה 🎊</span>
+                  <span>מיכאל רובינשטיין אישר הגעה! המערכת עודכנה 🎊</span>
                 </div>
               </div>
             )}
@@ -244,7 +244,7 @@ export default function LandingPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center shadow-md">
                 <Heart className="w-4 h-4 text-white fill-white" />
               </div>
-              <span className="font-display text-xl font-bold text-dark-brown">SimchaLink</span>
+              <span className="font-display text-xl font-bold text-dark-brown">MarryME</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -268,7 +268,7 @@ export default function LandingPage() {
               </Link>
               <Link href="/auth/register" className="btn-primary text-sm py-2">
                 <Sparkles className="w-4 h-4" />
-                התחל בחינם
+                 הירשמו
               </Link>
             </div>
 
@@ -297,7 +297,7 @@ export default function LandingPage() {
             <hr className="border-stone-100" />
             <Link href="/auth/login" className="block font-hebrew text-stone-600 py-2">התחברות</Link>
             <Link href="/auth/register" className="btn-primary w-full justify-center text-sm">
-              התחל בחינם
+              התחל 
             </Link>
           </div>
         )}
@@ -355,7 +355,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link href="/auth/register" className="btn-primary text-base px-8 py-4 rounded-2xl shadow-luxury" style={{ animation: 'pulseRing 2s infinite' }}>
                 <Heart className="w-5 h-5 fill-current" />
-                התחל תכנון בחינם
+                התחל תכנון 
               </Link>
               <a href="#how-it-works" className="btn-secondary text-base px-6 py-4 rounded-2xl">
                 <Phone className="w-4 h-4" />
@@ -431,9 +431,9 @@ export default function LandingPage() {
               demo={
                 <div className="space-y-2">
                   {[
-                    { name: 'משפחת כהן', status: 'confirmed', count: '4' },
-                    { name: 'חברי צבא', status: 'pending', count: '8' },
-                    { name: 'עמיתי עבודה', status: 'maybe', count: '3' },
+                    { name: 'משפחת שגב', status: 'confirmed', count: '4' },
+                    { name: 'חברים מהצבא', status: 'pending', count: '8' },
+                    { name: 'חברים מהעבודה', status: 'maybe', count: '3' },
                   ].map(g => (
                     <div key={g.name} className="flex items-center justify-between bg-white rounded-lg p-2">
                       <span className="font-hebrew text-xs text-stone-700">{g.name}</span>
@@ -461,7 +461,7 @@ export default function LandingPage() {
                 <div className="bg-[#ece5dd] rounded-xl p-3 text-xs space-y-2">
                   <div className="flex justify-end">
                     <div className="wa-bubble-out p-2 max-w-40">
-                      <p>💌 הזמנה לחתונת יעל ואורי</p>
+                      <p>💌 הזמנה לחתונה של ליאת ונתנאל</p>
                       <p className="text-gray-400 text-right">✓✓ 15:32</p>
                     </div>
                   </div>
@@ -557,8 +557,8 @@ export default function LandingPage() {
               demo={
                 <div className="space-y-2">
                   {[
-                    { name: 'סטודיו אור', cat: 'צילום', rating: '4.9', badge: '⭐ מומלץ' },
-                    { name: 'DJ מיקי', cat: 'מוזיקה', rating: '4.8', badge: '' },
+                    { name: 'צילום פולורויד', cat: 'צילום', rating: '4.9', badge: '⭐ מומלץ' },
+                    { name: 'DJ Itay Galo', cat: 'מוזיקה', rating: '4.8', badge: '' },
                   ].map(v => (
                     <div key={v.name} className="flex items-center justify-between bg-white rounded-lg p-2">
                       <div>
@@ -698,7 +698,7 @@ export default function LandingPage() {
               name="רחל ואלעד מזרחי"
               role="נישאו ב-2024 • תל אביב"
               rating={5}
-              text="SimchaLink שינתה לנו את חיי הארגון לגמרי. שלחנו הזמנות ל-280 אורחים בלחיצה אחת, וה-dashboard נתן לנו תמונה ברורה בזמן אמת על מי אישר ומי לא."
+              text="MarryME שינתה לנו את חיי הארגון לגמרי. שלחנו הזמנות ל-280 אורחים בלחיצה אחת, וה-dashboard נתן לנו תמונה ברורה בזמן אמת על מי אישר ומי לא."
             />
             <Testimonial
               name="נועה וגל שפירא"
@@ -716,6 +716,97 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ===== PRICING SECTION ===== */}
+      <section id="pricing" className="py-24 bg-ivory">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl font-light text-dark-brown mb-4">
+              מחירים
+              <span className="gradient-text font-bold"> פשוטים ושקופים</span>
+            </h2>
+            <p className="text-stone-500 font-hebrew text-lg">ללא הפתעות. ללא כרטיס אשראי להתחלה.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan */}
+            <div className="bg-white rounded-3xl border-2 border-stone-200 p-8 flex flex-col">
+              <div className="mb-6">
+                <h3 className="font-display text-2xl font-bold text-dark-brown mb-1">חינם</h3>
+                <p className="text-stone-400 font-hebrew text-sm">לתכנון ראשוני</p>
+                <div className="mt-4 flex items-end gap-1">
+                  <span className="font-display text-5xl font-bold text-dark-brown">₪0</span>
+                  <span className="text-stone-400 font-hebrew mb-1">/ לחודש</span>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['עד 50 אורחים', 'ניהול תקציב בסיסי', 'אתר אירוע אישי', 'ייצוא PDF'].map(f => (
+                  <li key={f} className="flex items-center gap-2 font-hebrew text-stone-600 text-sm">
+                    <Check className="w-4 h-4 text-sage-500 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/auth/register" className="block text-center py-3 rounded-xl border-2 border-stone-300 text-stone-600 font-hebrew font-semibold hover:border-champagne-400 hover:text-champagne-600 transition-colors">
+                התחל בחינם
+              </Link>
+            </div>
+
+            {/* Pro Plan - highlighted */}
+            <div className="bg-dark-brown rounded-3xl border-2 border-champagne-400 p-8 flex flex-col relative shadow-2xl scale-105">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-champagne-400 text-dark-brown text-xs font-bold font-hebrew px-4 py-1 rounded-full">
+                הכי פופולרי
+              </div>
+              <div className="mb-6">
+                <h3 className="font-display text-2xl font-bold text-white mb-1">פרו</h3>
+                <p className="text-stone-400 font-hebrew text-sm">לאירוע שלם ומנוהל</p>
+                <div className="mt-4 flex items-end gap-1">
+                  <span className="font-display text-5xl font-bold text-champagne-400">₪99</span>
+                  <span className="text-stone-400 font-hebrew mb-1">/ לחודש</span>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['אורחים ללא הגבלה', 'הזמנות WhatsApp', 'סידורי הושבה', 'ניהול ספקים', 'דוחות ואנליטיקה', 'תמיכה מועדפת'].map(f => (
+                  <li key={f} className="flex items-center gap-2 font-hebrew text-stone-300 text-sm">
+                    <Check className="w-4 h-4 text-champagne-400 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/auth/register" className="btn-primary block text-center py-3 rounded-xl font-hebrew font-semibold">
+                התחל 30 יום חינם
+              </Link>
+            </div>
+
+            {/* Premium Plan */}
+            <div className="bg-white rounded-3xl border-2 border-stone-200 p-8 flex flex-col">
+              <div className="mb-6">
+                <h3 className="font-display text-2xl font-bold text-dark-brown mb-1">פרמיום</h3>
+                <p className="text-stone-400 font-hebrew text-sm">לאירועים מורכבים</p>
+                <div className="mt-4 flex items-end gap-1">
+                  <span className="font-display text-5xl font-bold text-dark-brown">₪199</span>
+                  <span className="text-stone-400 font-hebrew mb-1">/ לחודש</span>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['כל מה שבפרו', 'ניהול מרובה אירועים', 'דומיין מותאם אישית', 'אינטגרציה מלאה', 'מנהל חשבון אישי', 'SLA מובטח'].map(f => (
+                  <li key={f} className="flex items-center gap-2 font-hebrew text-stone-600 text-sm">
+                    <Check className="w-4 h-4 text-sage-500 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/auth/register" className="block text-center py-3 rounded-xl border-2 border-stone-300 text-stone-600 font-hebrew font-semibold hover:border-champagne-400 hover:text-champagne-600 transition-colors">
+                צור קשר
+              </Link>
+            </div>
+          </div>
+
+          <p className="text-center text-stone-400 font-hebrew text-sm mt-10">
+            ✓ ביטול בכל עת ✓ ללא כרטיס אשראי להתחלה ✓ גיבוי נתונים מלא
+          </p>
+        </div>
+      </section>
+
       {/* ===== CTA SECTION ===== */}
       <section className="py-24 bg-dark-brown relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(220,146,41,0.2)_0%,_transparent_70%)]" />
@@ -727,14 +818,14 @@ export default function LandingPage() {
             <span className="gradient-text font-bold"> האירוע שלכם?</span>
           </h2>
           <p className="text-stone-400 font-hebrew text-lg leading-relaxed">
-            הצטרפו ל-2,000+ זוגות שכבר משתמשים ב-SimchaLink לתכנון החתונה שלהם.
+            הצטרפו ל-2,000+ זוגות שכבר משתמשים ב-MarryME לתכנון החתונה שלהם.
             <br />
             <strong className="text-champagne-400">חינם לחלוטין למשך 30 יום.</strong>
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/auth/register" className="btn-primary text-lg px-10 py-4 rounded-2xl">
               <Heart className="w-5 h-5 fill-current" />
-              התחל עכשיו — בחינם
+              התחל עכשיו  
             </Link>
             <Link href="/auth/login" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border border-stone-600 text-stone-300 hover:border-champagne-400 hover:text-champagne-400 transition-colors font-hebrew">
               יש לי כבר חשבון
@@ -755,7 +846,7 @@ export default function LandingPage() {
                 <div className="w-7 h-7 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-lg flex items-center justify-center">
                   <Heart className="w-4 h-4 text-white fill-white" />
                 </div>
-                <span className="font-display text-lg font-bold text-white">SimchaLink</span>
+                <span className="font-display text-lg font-bold text-white">MarryME</span>
               </div>
               <p className="text-sm font-hebrew leading-relaxed">
                 הפלטפורמה החכמה לניהול אירועים בישראל
@@ -779,7 +870,7 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="border-t border-stone-800 pt-8 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm font-hebrew">© 2025 SimchaLink. כל הזכויות שמורות.</p>
+            <p className="text-sm font-hebrew">© 2026 MarryME. כל הזכויות שמורות.</p>
             <p className="text-sm font-hebrew">
               נעשה בישראל עם ❤️ לחתונות ישראליות
             </p>

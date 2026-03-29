@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import type { Guest, Event, Table, Expense, Income, Vendor } from '@/types'
 
@@ -43,16 +43,20 @@ export function useGuests(eventId: string) {
 
   useEffect(() => { load() }, [load])
 
-  const stats = {
-    total: guests.length,
-    confirmed: guests.filter(g => g.status === 'confirmed').length,
-    pending: guests.filter(g => g.status === 'pending').length,
-    declined: guests.filter(g => g.status === 'declined').length,
-    maybe: guests.filter(g => g.status === 'maybe').length,
-    totalPeople: guests.filter(g => g.status === 'confirmed').reduce((a, g) => a + (g.confirmed_count || 0), 0),
-    withPhone: guests.filter(g => g.phone).length,
-    invitationSent: guests.filter(g => g.invitation_sent).length,
-  }
+  // Memoized: only recalculates when guests array changes
+  const stats = useMemo(() => {
+    const confirmed = guests.filter(g => g.status === 'confirmed')
+    return {
+      total: guests.length,
+      confirmed: confirmed.length,
+      pending: guests.filter(g => g.status === 'pending').length,
+      declined: guests.filter(g => g.status === 'declined').length,
+      maybe: guests.filter(g => g.status === 'maybe').length,
+      totalPeople: confirmed.reduce((a, g) => a + (g.confirmed_count || 0), 0),
+      withPhone: guests.filter(g => g.phone).length,
+      invitationSent: guests.filter(g => g.invitation_sent).length,
+    }
+  }, [guests])
 
   return { guests, loading, stats, reload: load }
 }
@@ -86,15 +90,21 @@ export function useBudget(eventId: string) {
 
   useEffect(() => { load() }, [load])
 
-  const summary = {
-    totalBudget,
-    totalExpenses: expenses.reduce((a, e) => a + e.total_amount, 0),
-    totalPaid: expenses.reduce((a, e) => a + (e.advance_paid || 0) + (e.paid_amount || 0), 0),
-    totalIncome: incomes.reduce((a, i) => a + i.amount, 0),
-    get remaining() { return this.totalBudget - this.totalExpenses },
-    get balance() { return this.totalIncome - this.totalPaid },
-    get budgetUsedPct() { return this.totalBudget > 0 ? Math.round((this.totalExpenses / this.totalBudget) * 100) : 0 },
-  }
+  // Memoized: only recalculates when data changes
+  const summary = useMemo(() => {
+    const totalExpenses = expenses.reduce((a, e) => a + e.total_amount, 0)
+    const totalPaid = expenses.reduce((a, e) => a + (e.advance_paid || 0) + (e.paid_amount || 0), 0)
+    const totalIncome = incomes.reduce((a, i) => a + i.amount, 0)
+    return {
+      totalBudget,
+      totalExpenses,
+      totalPaid,
+      totalIncome,
+      remaining: totalBudget - totalExpenses,
+      balance: totalIncome - totalPaid,
+      budgetUsedPct: totalBudget > 0 ? Math.round((totalExpenses / totalBudget) * 100) : 0,
+    }
+  }, [expenses, incomes, totalBudget])
 
   return { expenses, incomes, categories, summary, loading, reload: load }
 }

@@ -18,14 +18,17 @@ export const metadata: Metadata = {
   title: { default: 'SimchaLink - ניהול אירועים חכם', template: '%s | SimchaLink' },
   description: 'פלטפורמה מתקדמת לניהול חתונות ואירועים',
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'SimchaLink' },
-  icons: { icon: '/favicon.svg' },
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'MarryME' },
+  icons: { icon: '/favicon.svg', apple: '/icon-192.png' },
   openGraph: { type: 'website', locale: 'he_IL', title: 'SimchaLink', description: 'כל הכלים לחתונה המושלמת' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="he" dir="rtl" suppressHydrationWarning>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       <body className={`${cormorant.variable} ${dmSans.variable} ${heebo.variable} font-hebrew antialiased`}>
         {children}
         <Toaster

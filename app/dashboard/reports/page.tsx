@@ -5,9 +5,12 @@ import {
   Download, FileText, Users, DollarSign, LayoutGrid,
   TrendingUp, Loader2, Printer, Share2, CheckCircle2
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase-client'
-import { BudgetPieChart, GuestDonut } from '@/components/charts'
 import { formatCurrency, formatDateHebrew } from '@/lib/utils'
+
+const BudgetPieChart = dynamic(() => import('@/components/charts').then(m => ({ default: m.BudgetPieChart })), { ssr: false })
+const GuestDonut = dynamic(() => import('@/components/charts').then(m => ({ default: m.GuestDonut })), { ssr: false })
 import toast from 'react-hot-toast'
 
 export default function ReportsPage() {

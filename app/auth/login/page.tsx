@@ -21,17 +21,19 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+    console.log('Login result:', { error, session: data?.session, user: data?.user?.email })
+
     if (error) {
       setError('אימייל או סיסמה שגויים. נסה שנית.')
       setLoading(false)
       return
     }
-    
+
     toast.success('ברוך השב! 💍')
-    router.push('/dashboard')
     router.refresh()
+    router.push('/dashboard')
   }
 
   const handleGoogleLogin = async () => {
@@ -87,7 +89,7 @@ export default function LoginPage() {
           <div className="w-10 h-10 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center shadow-md">
             <Heart className="w-5 h-5 text-white fill-white" />
           </div>
-          <span className="font-display text-2xl font-bold text-dark-brown">SimchaLink</span>
+          <span className="font-display text-2xl font-bold text-dark-brown">MarryME</span>
         </Link>
 
         <div className="w-full max-w-md">

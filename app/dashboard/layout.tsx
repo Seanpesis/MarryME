@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 import { MobileBottomNav } from '@/components/dashboard/MobileNav'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import toast from 'react-hot-toast'
 
 const NAV_ITEMS = [
@@ -91,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center shadow-md">
               <Heart className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="font-display text-xl font-bold text-dark-brown">SimchaLink</span>
+            <span className="font-display text-xl font-bold text-dark-brown">MarryME</span>
           </Link>
         </div>
 
@@ -203,7 +204,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page content */}
         <main className="flex-1 overflow-auto pb-20 lg:pb-0">
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
 

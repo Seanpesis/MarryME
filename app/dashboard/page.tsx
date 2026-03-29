@@ -9,9 +9,16 @@ import {
   TrendingUp, AlertTriangle, Sparkles, Heart, FileText,
   Globe, Search, Bell, ChevronRight, Zap
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase-client'
-import { GuestDonut, RsvpAreaChart } from '@/components/charts'
 import { RealtimeIndicator } from '@/components/dashboard/RealtimeProvider'
+
+const GuestDonut = dynamic(() => import('@/components/charts').then(m => ({ default: m.GuestDonut })), {
+  ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-champagne-300 border-t-champagne-600 animate-spin" /></div>
+})
+const RsvpAreaChart = dynamic(() => import('@/components/charts').then(m => ({ default: m.RsvpAreaChart })), {
+  ssr: false, loading: () => <div className="h-40 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-champagne-300 border-t-champagne-600 animate-spin" /></div>
+})
 import toast from 'react-hot-toast'
 
 /* ─────────────────── CREATE EVENT MODAL ─────────────────── */
@@ -290,7 +297,7 @@ export default function DashboardPage() {
       )}
       <div className="text-center space-y-6 max-w-md">
         <div className="text-7xl animate-bounce">💍</div>
-        <h2 className="font-display text-3xl font-bold text-dark-brown">ברוכים הבאים ל-SimchaLink!</h2>
+        <h2 className="font-display text-3xl font-bold text-dark-brown">ברוכים הבאים ל-MarryME!</h2>
         <p className="text-stone-500 font-hebrew leading-relaxed">
           צרו את האירוע הראשון שלכם וקבלו גישה לכל הכלים לניהול החתונה המושלמת.
         </p>
@@ -567,7 +574,7 @@ export default function DashboardPage() {
             <div>
               <p className="font-bold font-hebrew text-dark-brown">אתר האירוע</p>
               <p className="text-sm text-stone-400 font-hebrew">
-                {event?.venue ? `simchalink.app/e/${event.id?.slice(0,8)}` : 'הגדר את אתר האירוע שלך'}
+                {event?.venue ? `MarryME.app/e/${event.id?.slice(0,8)}` : 'הגדר את אתר האירוע שלך'}
               </p>
             </div>
             <ChevronRight className="w-5 h-5 text-stone-300 mr-auto" />

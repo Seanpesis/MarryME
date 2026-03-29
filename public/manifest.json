@@ -1,6 +1,6 @@
 {
-  "name": "SimchaLink - ניהול אירועים",
-  "short_name": "SimchaLink",
+  "name": "MarryME - ניהול אירועים",
+  "short_name": "MarryME",
   "description": "פלטפורמה חכמה לניהול חתונות ואירועים",
   "start_url": "/dashboard",
   "display": "standalone",
@@ -21,15 +21,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-dashboard.png",
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "לוח בקרה ראשי"
     }
   ],
   "categories": ["productivity", "utilities"],

@@ -14,19 +14,19 @@ const TEMPLATES = [
   {
     id: 't1',
     name: 'קלאסי רומנטי 💍',
-    preview: 'שלום {name},\nאנו שמחים להזמינך לחגוג עמנו את יום חתונתנו! 🌹\n\n💒 {event_name}\n📅 {date}\n⏰ {time}\n📍 {venue}\n\nנשמח מאוד לראותך!\nאנא אשר/י הגעה בלחיצה על הכפתור 💌',
+    preview: 'שלום {name},\nאנו שמחים להזמינך לחגוג עמנו את יום חתונתנו! 🌹\n\n💒 {event_name}\n📅 {date}\n⏰ {time}\n📍 {venue}\n\nנשמח מאוד לראותך!\n✅ אשר/י הגעה כאן:\n{rsvp_link}',
     style: 'bg-gradient-to-br from-champagne-50 to-blush-50 border-champagne-200',
   },
   {
     id: 't2',
     name: 'מודרני ☀️',
-    preview: 'היי {name} 👋\n\nמזמינים אותך לחתונה שלנו!\n\n✨ {event_name}\n📅 {date} בשעה {time}\n📍 {venue}\n\nמחכים לך! 🎊',
+    preview: 'היי {name} 👋\n\nמזמינים אותך לחתונה שלנו!\n\n✨ {event_name}\n📅 {date} בשעה {time}\n📍 {venue}\n\n👇 לחץ/י לאישור הגעה:\n{rsvp_link}',
     style: 'bg-gradient-to-br from-sage-50 to-blue-50 border-sage-200',
   },
   {
     id: 't3',
     name: 'פורמלי 👑',
-    preview: 'לכבוד {name},\n\nברוב שמחה ועם לב מלא אהבה, אנו מזמינים אותך לשמוח עמנו ביום חתונתנו.\n\n{event_name}\n{date} | {time}\n{venue}\n\nבכבוד רב ובציפייה לראותך',
+    preview: 'לכבוד {name},\n\nברוב שמחה ועם לב מלא אהבה, אנו מזמינים אותך לשמוח עמנו ביום חתונתנו.\n\n{event_name}\n{date} | {time}\n{venue}\n\nלאישור הגעה:\n{rsvp_link}\n\nבכבוד רב ובציפייה לראותך',
     style: 'bg-gradient-to-br from-stone-50 to-amber-50 border-stone-200',
   },
 ]
@@ -177,8 +177,10 @@ export default function InvitationsPage() {
     setSendProgress(0)
 
     const selected = guests.filter(g => selectedGuests.has(g.id))
+    let successCount = 0
+    let failCount = 0
+    const rsvpLink = `${window.location.origin}/e/${event.id.substring(0, 8)}`
 
-    // Simulate sending with progress (in real app, calls Green API / Twilio)
     for (let i = 0; i < selected.length; i++) {
       const guest = selected[i]
 
@@ -189,21 +191,42 @@ export default function InvitationsPage() {
         .replace(/{date}/g, event.date ? new Date(event.date).toLocaleDateString('he-IL') : '')
         .replace(/{time}/g, '19:00')
         .replace(/{venue}/g, event.venue || '')
+        .replace(/{rsvp_link}/g, rsvpLink)
 
-      // In production: POST to /api/whatsapp/send with phone + msg
-      // For now: simulate delay and mark as sent
-      await new Promise(resolve => setTimeout(resolve, 200))
-
-      await supabase.from('guests').update({
-        invitation_sent: true,
-        invitation_sent_at: new Date().toISOString(),
-        whatsapp_status: 'sent',
-      }).eq('id', guest.id)
+      try {
+        const res = await fetch('/api/whatsapp/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestId: guest.id,
+            phone: guest.phone,
+            message: msg,
+            eventId: event.id,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok && data.success) {
+          successCount++
+        } else {
+          failCount++
+          console.error(`Failed for ${guest.name}:`, data.error)
+        }
+      } catch (err) {
+        failCount++
+        console.error(`Error sending to ${guest.name}:`, err)
+      }
 
       setSendProgress(Math.round(((i + 1) / selected.length) * 100))
     }
 
-    toast.success(`✅ ${selected.length} הזמנות נשלחו!`)
+    if (failCount === 0) {
+      toast.success(`✅ ${successCount} הזמנות נשלחו בהצלחה!`)
+    } else if (successCount > 0) {
+      toast.success(`✅ ${successCount} נשלחו, ⚠️ ${failCount} נכשלו`)
+    } else {
+      toast.error(`שליחה נכשלה (${failCount} שגיאות). בדוק הגדרות Green API.`)
+    }
+
     setSending(false)
     setSelectedGuests(new Set())
     const id = localStorage.getItem('activeEventId') || ''
@@ -258,7 +281,7 @@ export default function InvitationsPage() {
                   <div>
                     <p className="font-bold font-hebrew text-sm text-dark-brown">{t.name}</p>
                     <p className="text-xs text-stone-500 font-hebrew mt-0.5 leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
-                      {t.preview.substring(0, 80)}...
+                      {Array.from(t.preview).slice(0, 80).join('')}...
                     </p>
                   </div>
                 </label>
@@ -280,7 +303,7 @@ export default function InvitationsPage() {
               placeholder={`השתמש ב-{name} לשם המוזמן\n{event_name} לשם האירוע\n{date} לתאריך\n{venue} למקום`}
             />
             <p className="text-xs text-stone-400 font-hebrew mt-2">
-              השאר ריק לשימוש בתבנית שנבחרה. משתנים: {'{name}'}, {'{event_name}'}, {'{date}'}, {'{time}'}, {'{venue}'}
+              השאר ריק לשימוש בתבנית שנבחרה. משתנים: {'{name}'}, {'{event_name}'}, {'{date}'}, {'{time}'}, {'{venue}'}, {'{rsvp_link}'}
             </p>
           </div>
 
@@ -391,7 +414,8 @@ export default function InvitationsPage() {
                 .replace(/{event_name}/g, event?.name || 'חתונת יעל ואורי')
                 .replace(/{date}/g, event?.date ? new Date(event.date).toLocaleDateString('he-IL') : '12.08.2025')
                 .replace(/{time}/g, '19:00')
-                .replace(/{venue}/g, event?.venue || 'אולם הגן הסגור')}
+                .replace(/{venue}/g, event?.venue || 'אולם הגן הסגור')
+                .replace(/{rsvp_link}/g, event ? `${typeof window !== 'undefined' ? window.location.origin : ''}/e/${event.id.substring(0, 8)}` : 'https://marryme.app/e/xxxxxxxx')}
             </div>
           </div>
 
@@ -415,14 +439,13 @@ export default function InvitationsPage() {
               ))}
             </div>
 
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-              <div className="flex items-start gap-2 text-sm font-hebrew text-amber-700">
-                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <div className="mt-4 p-3 bg-sage-50 border border-sage-200 rounded-xl">
+              <div className="flex items-start gap-2 text-sm font-hebrew text-sage-700">
+                <Check className="w-4 h-4 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold">הגדרת WhatsApp Business</p>
-                  <p className="text-xs mt-1 text-amber-600">
-                    לשליחה אמיתית יש להגדיר Green API / Twilio WhatsApp API בהגדרות החשבון.
-                    כרגע פועל במצב סימולציה.
+                  <p className="font-bold">Green API מחובר</p>
+                  <p className="text-xs mt-1 text-sage-600">
+                    הודעות נשלחות דרך Green API לוואטסאפ האמיתי של המוזמנים.
                   </p>
                 </div>
               </div>
