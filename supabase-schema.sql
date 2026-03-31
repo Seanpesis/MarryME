@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS tables (
   event_id UUID REFERENCES events(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
   capacity INTEGER DEFAULT 8,
-  shape TEXT DEFAULT 'round' CHECK (shape IN ('round', 'rectangle', 'oval')),
+  shape TEXT DEFAULT 'round' CHECK (shape IN ('round', 'rectangle', 'oval', 'square', 'long')),
   position_x DECIMAL DEFAULT 100,
   position_y DECIMAL DEFAULT 100,
   notes TEXT DEFAULT ''

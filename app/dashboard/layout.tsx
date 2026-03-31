@@ -88,11 +88,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       `}>
         {/* Logo */}
         <div className="p-5 border-b border-stone-100">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center shadow-md">
-              <Heart className="w-4 h-4 text-white fill-white" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 36 36" fill="none" className="w-9 h-9 group-hover:scale-110 transition-transform duration-200">
+                <circle cx="13" cy="18" r="9" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5"/>
+                <circle cx="23" cy="18" r="9" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5"/>
+                <path d="M18 24 C14.5 20.5 11 17 13.8 14.2 C15.4 12.6 18 14 18 14 C18 14 20.6 12.6 22.2 14.2 C25 17 21.5 20.5 18 24Z" fill="url(#logoGrad)"/>
+                <defs>
+                  <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#e4aa4e"/>
+                    <stop offset="100%" stopColor="#a35c19"/>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
-            <span className="font-display text-xl font-bold text-dark-brown">MarryME</span>
+            <span className="font-display text-[22px] font-bold text-dark-brown tracking-tight">MarryME</span>
           </Link>
         </div>
 

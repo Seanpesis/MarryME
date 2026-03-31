@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import PublicEventClient from './client'
+import { Loader2 } from 'lucide-react'
 
 interface Props {
   params: { slug: string }
@@ -38,5 +40,13 @@ export default async function PublicEventPage({ params }: Props) {
 
   if (!event) notFound()
 
-  return <PublicEventClient event={event} />
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-ivory">
+        <Loader2 className="w-8 h-8 animate-spin text-champagne-500" />
+      </div>
+    }>
+      <PublicEventClient event={event} />
+    </Suspense>
+  )
 }

@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, DM_Sans, Heebo } from 'next/font/google'
+import { Playfair_Display, Plus_Jakarta_Sans, Heebo } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
-const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['300','400','500','600','700'], variable: '--font-cormorant', display: 'swap' })
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' })
-const heebo = Heebo({ subsets: ['hebrew', 'latin'], variable: '--font-heebo', display: 'swap' })
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400','500','600','700','800','900'], variable: '--font-playfair', display: 'swap' })
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['300','400','500','600','700','800'], variable: '--font-jakarta', display: 'swap' })
+const heebo = Heebo({ subsets: ['hebrew', 'latin'], weight: ['300','400','500','600','700','800'], variable: '--font-heebo', display: 'swap' })
 
 export const viewport: Viewport = {
   themeColor: '#dc9229',
@@ -15,12 +15,12 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: { default: 'SimchaLink - ניהול אירועים חכם', template: '%s | SimchaLink' },
+  title: { default: 'MarryME - ניהול אירועים חכם', template: '%s | MarryME' },
   description: 'פלטפורמה מתקדמת לניהול חתונות ואירועים',
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'MarryME' },
   icons: { icon: '/favicon.svg', apple: '/icon-192.png' },
-  openGraph: { type: 'website', locale: 'he_IL', title: 'SimchaLink', description: 'כל הכלים לחתונה המושלמת' },
+  openGraph: { type: 'website', locale: 'he_IL', title: 'MarryME', description: 'כל הכלים לחתונה המושלמת' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${cormorant.variable} ${dmSans.variable} ${heebo.variable} font-hebrew antialiased`}>
+      <body className={`${playfair.variable} ${jakarta.variable} ${heebo.variable} font-hebrew antialiased`}>
         {children}
         <Toaster
           position="top-center"

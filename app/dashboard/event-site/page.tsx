@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Globe, Copy, ExternalLink, Edit2, Check, MapPin, Gift, Heart, MessageSquare, Calendar, Loader2, Save } from 'lucide-react'
+import { Globe, Copy, ExternalLink, Edit2, Check, MapPin, Gift, Heart, MessageSquare, Calendar, Loader2, Save, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 import toast from 'react-hot-toast'
+import { ISRAEL_VENUES, VENUE_REGIONS, type Venue } from '@/lib/venues'
 
 export default function EventSitePage() {
   const [event, setEvent] = useState<any>(null)
@@ -15,7 +16,29 @@ export default function EventSitePage() {
     cover_message: 'אנו שמחים להזמינכם לחגוג עמנו את יום חתונתנו המיוחד!',
   })
   const [copied, setCopied] = useState(false)
+  const [appUrl, setAppUrl] = useState('')
+  const [showVenuePicker, setShowVenuePicker] = useState(false)
+  const [venueSearch, setVenueSearch] = useState('')
+  const [venueRegion, setVenueRegion] = useState('הכל')
+  const [selectedVenueInfo, setSelectedVenueInfo] = useState<Venue | null>(null)
   const supabase = createClient()
+
+  useEffect(() => {
+    setAppUrl(window.location.origin)
+  }, [])
+
+  const filteredVenues = ISRAEL_VENUES.filter(v => {
+    const matchRegion = venueRegion === 'הכל' || v.region === venueRegion
+    const matchSearch = !venueSearch || v.name.includes(venueSearch) || v.city.includes(venueSearch)
+    return matchRegion && matchSearch
+  })
+
+  const handleSelectVenue = (venue: Venue) => {
+    setSelectedVenueInfo(venue)
+    setForm(f => ({ ...f, venue: venue.name, venue_address: venue.address }))
+    setShowVenuePicker(false)
+    setVenueSearch('')
+  }
 
   useEffect(() => {
     const id = localStorage.getItem('activeEventId') || ''
@@ -51,7 +74,7 @@ export default function EventSitePage() {
     loadEvent(event.id)
   }
 
-  const siteUrl = event ? `https://simchalink.app/event/${event.id.substring(0, 8)}` : ''
+  const siteUrl = event && appUrl ? `${appUrl}/event/${event.id.substring(0, 8)}` : ''
 
   const handleCopy = () => {
     navigator.clipboard.writeText(siteUrl)
@@ -122,7 +145,48 @@ export default function EventSitePage() {
               <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="input-field" />
             </div>
             <div>
-              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם המקום</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-semibold font-hebrew text-stone-700">שם המקום</label>
+                <button
+                  type="button"
+                  onClick={() => setShowVenuePicker(v => !v)}
+                  className="text-xs text-champagne-600 font-hebrew font-semibold hover:underline flex items-center gap-1"
+                >
+                  🗺️ בחר מרשימת אולמות
+                  <ChevronDown className={`w-3 h-3 transition-transform ${showVenuePicker ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+
+              {showVenuePicker && (
+                <div className="mb-3 border border-champagne-200 rounded-2xl overflow-hidden bg-white shadow-card">
+                  <div className="p-3 border-b border-champagne-100 space-y-2">
+                    <input
+                      type="text" value={venueSearch} onChange={e => setVenueSearch(e.target.value)}
+                      placeholder="חפש אולם..." className="input-field py-2 text-sm" autoFocus
+                    />
+                    <div className="flex gap-1 flex-wrap">
+                      {['הכל', ...VENUE_REGIONS].map(r => (
+                        <button key={r} type="button" onClick={() => setVenueRegion(r)}
+                          className={`text-xs px-2 py-0.5 rounded-full font-hebrew font-semibold transition-colors ${
+                            venueRegion === r ? 'bg-champagne-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-champagne-100'
+                          }`}>{r}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="max-h-44 overflow-y-auto">
+                    {filteredVenues.map(v => (
+                      <button key={v.id} type="button" onClick={() => handleSelectVenue(v)}
+                        className="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-champagne-50 text-right border-b border-stone-50 last:border-0 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-dark-brown font-hebrew text-sm">{v.name}</p>
+                          <p className="text-xs text-stone-500 font-hebrew">{v.city} · {v.phone}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <input type="text" value={form.venue} onChange={e => setForm(f => ({ ...f, venue: e.target.value }))} className="input-field" placeholder="אולם הגן הסגור" />
             </div>
             <div>
@@ -132,6 +196,15 @@ export default function EventSitePage() {
               </label>
               <input type="text" value={form.venue_address} onChange={e => setForm(f => ({ ...f, venue_address: e.target.value }))} className="input-field" placeholder="רחוב הורד 12, כפר סבא" />
             </div>
+            {selectedVenueInfo && (
+              <div className="bg-champagne-50 border border-champagne-200 rounded-xl p-3 text-sm font-hebrew flex items-center gap-2 text-champagne-800">
+                <span>📞</span>
+                <span className="font-semibold">{selectedVenueInfo.name}</span>
+                <span>·</span>
+                <span dir="ltr">{selectedVenueInfo.phone}</span>
+                <span className="text-xs text-champagne-600">· {selectedVenueInfo.capacity} אורחים</span>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">הודעת ברוכים הבאים</label>
               <textarea value={form.cover_message} onChange={e => setForm(f => ({ ...f, cover_message: e.target.value }))} className="input-field resize-none" rows={2} />
@@ -270,7 +343,7 @@ export default function EventSitePage() {
               <div className="text-center pb-4">
                 <p className="text-xs text-stone-300 font-hebrew flex items-center justify-center gap-1">
                   <Heart className="w-3 h-3 fill-current text-champagne-300" />
-                  נוצר עם SimchaLink
+                  נוצר עם MarryME
                 </p>
               </div>
             </div>

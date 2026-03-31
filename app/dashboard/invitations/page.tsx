@@ -14,19 +14,19 @@ const TEMPLATES = [
   {
     id: 't1',
     name: 'קלאסי רומנטי 💍',
-    preview: 'שלום {name},\nאנו שמחים להזמינך לחגוג עמנו את יום חתונתנו! 🌹\n\n💒 {event_name}\n📅 {date}\n⏰ {time}\n📍 {venue}\n\nנשמח מאוד לראותך!\n✅ אשר/י הגעה כאן:\n{rsvp_link}',
+    preview: 'שלום {name},\nאנו שמחים להזמינך לחגוג עמנו את יום חתונתנו! 🌹\n\n💒 {event_name}\n📅 {date}\n⏰ {time}\n📍 {venue}\n🗺️ {venue_address}\n\nנשמח מאוד לראותך!\n✅ אשר/י הגעה כאן:\n{rsvp_link}',
     style: 'bg-gradient-to-br from-champagne-50 to-blush-50 border-champagne-200',
   },
   {
     id: 't2',
     name: 'מודרני ☀️',
-    preview: 'היי {name} 👋\n\nמזמינים אותך לחתונה שלנו!\n\n✨ {event_name}\n📅 {date} בשעה {time}\n📍 {venue}\n\n👇 לחץ/י לאישור הגעה:\n{rsvp_link}',
+    preview: 'היי {name} 👋\n\nמזמינים אותך לחתונה שלנו!\n\n✨ {event_name}\n📅 {date} בשעה {time}\n📍 {venue}\n🗺️ {venue_address}\n\n👇 לחץ/י לאישור הגעה:\n{rsvp_link}',
     style: 'bg-gradient-to-br from-sage-50 to-blue-50 border-sage-200',
   },
   {
     id: 't3',
     name: 'פורמלי 👑',
-    preview: 'לכבוד {name},\n\nברוב שמחה ועם לב מלא אהבה, אנו מזמינים אותך לשמוח עמנו ביום חתונתנו.\n\n{event_name}\n{date} | {time}\n{venue}\n\nלאישור הגעה:\n{rsvp_link}\n\nבכבוד רב ובציפייה לראותך',
+    preview: 'לכבוד {name},\n\nברוב שמחה ועם לב מלא אהבה, אנו מזמינים אותך לשמוח עמנו ביום חתונתנו.\n\n{event_name}\n{date} | {time}\n{venue}\n{venue_address}\n\nלאישור הגעה:\n{rsvp_link}\n\nבכבוד רב ובציפייה לראותך',
     style: 'bg-gradient-to-br from-stone-50 to-amber-50 border-stone-200',
   },
 ]
@@ -179,10 +179,13 @@ export default function InvitationsPage() {
     const selected = guests.filter(g => selectedGuests.has(g.id))
     let successCount = 0
     let failCount = 0
-    const rsvpLink = `${window.location.origin}/e/${event.id.substring(0, 8)}`
+    const eventSlug = event.id.substring(0, 8)
 
     for (let i = 0; i < selected.length; i++) {
       const guest = selected[i]
+
+      // Guest-specific RSVP link so the system knows who responded
+      const rsvpLink = `${window.location.origin}/event/${eventSlug}?guest=${guest.id}`
 
       // Build personalized message
       const msg = (customMessage || template.preview)
@@ -191,6 +194,7 @@ export default function InvitationsPage() {
         .replace(/{date}/g, event.date ? new Date(event.date).toLocaleDateString('he-IL') : '')
         .replace(/{time}/g, '19:00')
         .replace(/{venue}/g, event.venue || '')
+        .replace(/{venue_address}/g, event.venue_address || event.venue || '')
         .replace(/{rsvp_link}/g, rsvpLink)
 
       try {

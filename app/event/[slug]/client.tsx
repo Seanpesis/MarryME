@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { MapPin, Gift, MessageSquare, Calendar, Heart, Check, Send, Loader2, ExternalLink } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { MapPin, Gift, MessageSquare, Calendar, Heart, Check, Send, Loader2, Plus, Minus } from 'lucide-react'
 
 interface Props {
   event: {
@@ -21,14 +22,14 @@ interface Props {
 function Confetti() {
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-      {[...Array(30)].map((_, i) => (
+      {[...Array(40)].map((_, i) => (
         <div
           key={i}
           className="absolute w-2 h-2 rounded-sm"
           style={{
             left: `${Math.random() * 100}%`,
             top: '-10px',
-            backgroundColor: ['#dc9229', '#548150', '#e85555', '#faf8f5', '#4A7C59'][i % 5],
+            backgroundColor: ['#dc9229', '#548150', '#e85555', '#faf8f5', '#4A7C59', '#e4aa4e'][i % 6],
             animation: `confettiFall ${2 + Math.random() * 3}s ease-in ${Math.random() * 2}s forwards`,
             transform: `rotate(${Math.random() * 360}deg)`,
           }}
@@ -39,14 +40,46 @@ function Confetti() {
 }
 
 export default function PublicEventClient({ event }: Props) {
+  const searchParams = useSearchParams()
+  const guestId = searchParams.get('guest')
+
+  const [guestName, setGuestName] = useState('')
+  const [guestPartySize, setGuestPartySize] = useState(1)
   const [blessingText, setBlessingText] = useState('')
   const [blessingName, setBlessingName] = useState('')
   const [blessingSent, setBlessingSent] = useState(false)
   const [blessingLoading, setBlessingLoading] = useState(false)
   const [showBlessing, setShowBlessing] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
-  const [rsvpStatus, setRsvpStatus] = useState<'yes' | 'no' | null>(null)
-  const [rsvpDone, setRsvpDone] = useState(false)
+
+  // RSVP state
+  const [rsvpStep, setRsvpStep] = useState<'ask' | 'count' | 'done'>('ask')
+  const [rsvpStatus, setRsvpStatus] = useState<'confirmed' | 'declined' | null>(null)
+  const [rsvpCount, setRsvpCount] = useState(1)
+  const [rsvpLoading, setRsvpLoading] = useState(false)
+
+  // Load guest info if guestId provided
+  useEffect(() => {
+    if (!guestId) return
+    fetch(`/api/rsvp?guest=${guestId}`)
+      .then(r => r.json())
+      .then(({ guest }) => {
+        if (guest) {
+          setGuestName(guest.name)
+          setGuestPartySize(guest.party_size || 1)
+          setRsvpCount(guest.party_size || 1)
+          // If already responded, show done state
+          if (guest.status === 'confirmed') {
+            setRsvpStatus('confirmed')
+            setRsvpStep('done')
+          } else if (guest.status === 'declined') {
+            setRsvpStatus('declined')
+            setRsvpStep('done')
+          }
+        }
+      })
+      .catch(() => {})
+  }, [guestId])
 
   const formattedDate = event.date
     ? new Date(event.date).toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -56,20 +89,54 @@ export default function PublicEventClient({ event }: Props) {
     ? `https://waze.com/ul?q=${encodeURIComponent(event.venue_address)}`
     : `https://waze.com/ul?q=${encodeURIComponent(event.venue || '')}`
 
-  const handleRsvp = (status: 'yes' | 'no') => {
-    setRsvpStatus(status)
-    setRsvpDone(true)
-    if (status === 'yes') {
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 5000)
+  const handleRsvpYes = () => {
+    setRsvpStep('count')
+  }
+
+  const handleRsvpNo = async () => {
+    setRsvpLoading(true)
+    if (guestId) {
+      await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestId, status: 'declined', count: 0 }),
+      })
     }
+    setRsvpStatus('declined')
+    setRsvpStep('done')
+    setRsvpLoading(false)
+  }
+
+  const handleConfirmCount = async () => {
+    setRsvpLoading(true)
+    if (guestId) {
+      await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestId, status: 'confirmed', count: rsvpCount }),
+      })
+    }
+    setRsvpStatus('confirmed')
+    setRsvpStep('done')
+    setShowConfetti(true)
+    setTimeout(() => setShowConfetti(false), 5000)
+    setRsvpLoading(false)
   }
 
   const handleSendBlessing = async () => {
     if (!blessingText.trim()) return
     setBlessingLoading(true)
-    // Simulate sending (in production: save to DB)
-    await new Promise(r => setTimeout(r, 1200))
+    try {
+      await fetch('/api/blessings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_id: event.id,
+          name: blessingName || guestName || 'אורח',
+          message: blessingText,
+        }),
+      })
+    } catch {}
     setBlessingSent(true)
     setBlessingLoading(false)
   }
@@ -98,7 +165,10 @@ export default function PublicEventClient({ event }: Props) {
 
           {/* Names */}
           <div className="space-y-2">
-            <p className="text-stone-400 font-hebrew text-sm tracking-widest uppercase">אנו שמחים להזמינכם</p>
+            {guestName && (
+              <p className="text-champagne-600 font-hebrew text-sm font-semibold">שלום {guestName} 👋</p>
+            )}
+            <p className="text-stone-400 font-hebrew text-sm tracking-widest">אנו שמחים להזמינכם</p>
             <h1 className="font-display text-5xl font-light text-dark-brown leading-tight">
               {event.bride_name && event.groom_name
                 ? <>{event.bride_name}<br /><span className="text-3xl text-champagne-500">&</span><br />{event.groom_name}</>
@@ -203,34 +273,105 @@ export default function PublicEventClient({ event }: Props) {
             </button>
           </div>
 
-          {/* RSVP */}
+          {/* ─── RSVP Section ─── */}
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-card border border-champagne-100">
-            {!rsvpDone ? (
+
+            {/* Step 1: Ask yes/no */}
+            {rsvpStep === 'ask' && (
               <>
                 <p className="font-bold text-dark-brown font-hebrew text-lg mb-4">האם תוכלו להגיע? 🎊</p>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleRsvp('yes')}
+                    onClick={handleRsvpYes}
+                    disabled={rsvpLoading}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-sage-500 to-sage-600 text-white font-bold font-hebrew text-base shadow-md hover:shadow-lg active:scale-95 transition-all"
                   >
                     <Check className="w-5 h-5" />
                     כן, אגיע! 🎉
                   </button>
                   <button
-                    onClick={() => handleRsvp('no')}
+                    onClick={handleRsvpNo}
+                    disabled={rsvpLoading}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-stone-100 text-stone-600 font-bold font-hebrew text-base hover:bg-stone-200 active:scale-95 transition-all"
                   >
+                    {rsvpLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     לא אוכל 😔
                   </button>
                 </div>
               </>
-            ) : rsvpStatus === 'yes' ? (
+            )}
+
+            {/* Step 2: How many people */}
+            {rsvpStep === 'count' && (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl mb-2">🎉</div>
+                  <p className="font-bold text-dark-brown font-hebrew text-lg">כמה אנשים יגיעו?</p>
+                  <p className="text-stone-400 font-hebrew text-sm mt-1">כולל אתה/את</p>
+                </div>
+
+                {/* Counter */}
+                <div className="flex items-center justify-center gap-6">
+                  <button
+                    onClick={() => setRsvpCount(c => Math.max(1, c - 1))}
+                    className="w-12 h-12 rounded-2xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition-colors active:scale-95"
+                  >
+                    <Minus className="w-5 h-5 text-stone-600" />
+                  </button>
+                  <div className="text-center">
+                    <span className="font-display text-5xl font-bold text-dark-brown">{rsvpCount}</span>
+                    <p className="text-xs text-stone-400 font-hebrew mt-1">
+                      {rsvpCount === 1 ? 'אדם' : 'אנשים'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setRsvpCount(c => Math.min(20, c + 1))}
+                    className="w-12 h-12 rounded-2xl bg-champagne-100 hover:bg-champagne-200 flex items-center justify-center transition-colors active:scale-95"
+                  >
+                    <Plus className="w-5 h-5 text-champagne-700" />
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setRsvpStep('ask')}
+                    className="flex-1 py-3 rounded-2xl border-2 border-stone-200 text-stone-600 font-hebrew font-semibold hover:bg-stone-50 transition-colors text-sm"
+                  >
+                    חזור
+                  </button>
+                  <button
+                    onClick={handleConfirmCount}
+                    disabled={rsvpLoading}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-sage-500 to-sage-600 text-white font-bold font-hebrew shadow-md hover:shadow-lg active:scale-95 transition-all"
+                  >
+                    {rsvpLoading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <Check className="w-4 h-4" />
+                    }
+                    אישור הגעה!
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Done: confirmed */}
+            {rsvpStep === 'done' && rsvpStatus === 'confirmed' && (
               <div className="text-center space-y-2">
                 <div className="text-4xl">🎊</div>
                 <p className="font-bold text-sage-700 font-hebrew text-lg">מחכים לראותך!</p>
-                <p className="text-stone-500 font-hebrew text-sm">תודה על אישור ההגעה 💚</p>
+                <p className="text-stone-500 font-hebrew text-sm">
+                  אישרת הגעה עבור {rsvpCount} {rsvpCount === 1 ? 'אדם' : 'אנשים'} 💚
+                </p>
+                {!guestId && (
+                  <p className="text-xs text-stone-400 font-hebrew mt-1">
+                    (לעדכון אוטומטי בבסיס הנתונים, פתחו את הקישור האישי שנשלח ב-WhatsApp)
+                  </p>
+                )}
               </div>
-            ) : (
+            )}
+
+            {/* Done: declined */}
+            {rsvpStep === 'done' && rsvpStatus === 'declined' && (
               <div className="text-center space-y-2">
                 <div className="text-4xl">💙</div>
                 <p className="font-bold text-stone-700 font-hebrew">חבל שלא תוכל להגיע</p>
@@ -242,7 +383,7 @@ export default function PublicEventClient({ event }: Props) {
           {/* Footer */}
           <div className="flex items-center justify-center gap-1.5 text-stone-300 text-xs font-hebrew">
             <Heart className="w-3 h-3 fill-champagne-300 text-champagne-300" />
-            <span>נוצר עם SimchaLink</span>
+            <span>נוצר עם MarryME</span>
           </div>
         </div>
       </div>
@@ -265,7 +406,7 @@ export default function PublicEventClient({ event }: Props) {
                       <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שמכם</label>
                       <input
                         type="text"
-                        value={blessingName}
+                        value={blessingName || guestName}
                         onChange={e => setBlessingName(e.target.value)}
                         placeholder="שם מלא"
                         className="input-field"

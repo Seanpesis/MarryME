@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'display': ['var(--font-cormorant)', 'serif'],
-        'body': ['var(--font-dm-sans)', 'sans-serif'],
-        'hebrew': ['var(--font-heebo)', 'sans-serif'],
+        'display': ['var(--font-playfair)', 'Georgia', 'serif'],
+        'body': ['var(--font-jakarta)', 'sans-serif'],
+        'hebrew': ['var(--font-heebo)', 'var(--font-jakarta)', 'sans-serif'],
       },
       colors: {
         champagne: {

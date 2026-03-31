@@ -12,6 +12,7 @@ import {
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase-client'
 import { RealtimeIndicator } from '@/components/dashboard/RealtimeProvider'
+import { ISRAEL_VENUES, VENUE_REGIONS, type Venue } from '@/lib/venues'
 
 const GuestDonut = dynamic(() => import('@/components/charts').then(m => ({ default: m.GuestDonut })), {
   ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-champagne-300 border-t-champagne-600 animate-spin" /></div>
@@ -28,8 +29,25 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
     venue: '', venue_address: '', total_budget: ''
   })
   const [loading, setLoading] = useState(false)
+  const [venueSearch, setVenueSearch] = useState('')
+  const [showVenuePicker, setShowVenuePicker] = useState(false)
+  const [selectedRegion, setSelectedRegion] = useState<string>('הכל')
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null)
   const supabase = createClient()
   const u = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  const filteredVenues = ISRAEL_VENUES.filter(v => {
+    const matchRegion = selectedRegion === 'הכל' || v.region === selectedRegion
+    const matchSearch = !venueSearch || v.name.includes(venueSearch) || v.city.includes(venueSearch) || v.address.includes(venueSearch)
+    return matchRegion && matchSearch
+  })
+
+  const handleSelectVenue = (venue: Venue) => {
+    setSelectedVenue(venue)
+    setForm(f => ({ ...f, venue: venue.name, venue_address: venue.address }))
+    setShowVenuePicker(false)
+    setVenueSearch('')
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,7 +75,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-lg max-h-[92vh] overflow-y-auto">
         <div className="p-6 border-b border-stone-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center">
@@ -96,17 +114,106 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <input type="date" value={form.date} onChange={e => u('date', e.target.value)} required className="input-field" />
           </div>
 
+          {/* Venue Picker */}
           <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם האולם</label>
-            <input type="text" value={form.venue} onChange={e => u('venue', e.target.value)} placeholder="אולם הגן הסגור" className="input-field" />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-semibold font-hebrew text-stone-700">
+                <MapPin className="w-4 h-4 inline ml-1" />מקום האירוע
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowVenuePicker(v => !v)}
+                className="text-xs text-champagne-600 font-hebrew font-semibold hover:text-champagne-700 underline"
+              >
+                {showVenuePicker ? 'סגור רשימה' : '🗺️ בחר מרשימת אולמות ישראל'}
+              </button>
+            </div>
+
+            {showVenuePicker && (
+              <div className="mb-3 border border-champagne-200 rounded-2xl overflow-hidden bg-champagne-50/30">
+                {/* Search + region filter */}
+                <div className="p-3 border-b border-champagne-100 space-y-2">
+                  <input
+                    type="text"
+                    value={venueSearch}
+                    onChange={e => setVenueSearch(e.target.value)}
+                    placeholder="חפש אולם לפי שם או עיר..."
+                    className="input-field py-2 text-sm"
+                    autoFocus
+                  />
+                  <div className="flex gap-1.5 flex-wrap">
+                    {['הכל', ...VENUE_REGIONS].map(r => (
+                      <button
+                        key={r} type="button"
+                        onClick={() => setSelectedRegion(r)}
+                        className={`text-xs px-2.5 py-1 rounded-full font-hebrew font-semibold transition-colors ${
+                          selectedRegion === r
+                            ? 'bg-champagne-500 text-white'
+                            : 'bg-white border border-stone-200 text-stone-600 hover:border-champagne-300'
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Venue list */}
+                <div className="max-h-52 overflow-y-auto">
+                  {filteredVenues.length === 0 ? (
+                    <p className="text-center text-stone-400 font-hebrew text-sm py-4">לא נמצאו אולמות</p>
+                  ) : (
+                    filteredVenues.map(venue => (
+                      <button
+                        key={venue.id} type="button"
+                        onClick={() => handleSelectVenue(venue)}
+                        className="w-full flex items-start gap-3 px-4 py-3 hover:bg-champagne-50 transition-colors text-right border-b border-stone-50 last:border-0"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-champagne-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <MapPin className="w-4 h-4 text-champagne-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-dark-brown font-hebrew text-sm">{venue.name}</p>
+                          <p className="text-xs text-stone-500 font-hebrew truncate">{venue.city} · {venue.address}</p>
+                          <p className="text-xs text-champagne-600 font-hebrew">{venue.phone} · {venue.capacity} אורחים</p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            <input
+              type="text" value={form.venue}
+              onChange={e => { u('venue', e.target.value); setSelectedVenue(null) }}
+              placeholder="שם האולם"
+              className="input-field"
+            />
           </div>
 
+          {/* Venue details (auto-filled or manual) */}
           <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">
-              <MapPin className="w-4 h-4 inline ml-1" />כתובת
-            </label>
-            <input type="text" value={form.venue_address} onChange={e => u('venue_address', e.target.value)} placeholder="רחוב הורד 12, כפר סבא" className="input-field" />
+            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">כתובת לניווט</label>
+            <input
+              type="text" value={form.venue_address}
+              onChange={e => u('venue_address', e.target.value)}
+              placeholder="רחוב הורד 12, כפר סבא"
+              className="input-field"
+            />
           </div>
+
+          {/* Show venue phone if a venue was selected */}
+          {selectedVenue && (
+            <div className="bg-champagne-50 border border-champagne-200 rounded-xl p-3 text-sm font-hebrew">
+              <div className="flex items-center gap-2 text-champagne-800">
+                <span className="text-base">📞</span>
+                <span className="font-semibold">{selectedVenue.name}</span>
+                <span>·</span>
+                <span dir="ltr">{selectedVenue.phone}</span>
+              </div>
+              <p className="text-xs text-champagne-600 mt-1">מספר הטלפון ישמר בפרטי האירוע לשימושכם</p>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">

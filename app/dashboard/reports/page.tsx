@@ -311,7 +311,7 @@ export default function ReportsPage() {
 
         {/* Print footer */}
         <div className="hidden print:block text-center text-xs text-stone-400 pt-4 border-t border-stone-200">
-          <p>דוח נוצר ב-{new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })} • SimchaLink</p>
+          <p>דוח נוצר ב-{new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })} • MarryME</p>
         </div>
       </div>
 

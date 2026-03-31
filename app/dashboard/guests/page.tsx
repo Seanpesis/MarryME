@@ -239,17 +239,57 @@ function ImportModal({ eventId, onClose, onImported }: { eventId: string; onClos
                 <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
               </div>
 
-              {/* Format guide */}
-              <div className="bg-stone-50 rounded-xl p-4">
-                <p className="font-bold font-hebrew text-sm text-stone-700 mb-2">פורמט מומלץ לקובץ:</p>
-                <div className="grid grid-cols-3 gap-2 text-xs font-hebrew text-stone-500">
-                  {['שם', 'טלפון', 'כמות'].map(h => (
-                    <div key={h} className="bg-white rounded-lg px-2 py-1.5 text-center border border-stone-200 font-bold text-champagne-700">{h}</div>
-                  ))}
-                  {['דני כהן', '0501234567', '2'].map(v => (
-                    <div key={v} className="bg-white rounded-lg px-2 py-1.5 text-center border border-stone-100 text-stone-600">{v}</div>
-                  ))}
+              {/* Format guide + template download */}
+              <div className="bg-stone-50 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold font-hebrew text-sm text-stone-700">פורמט הקובץ הנדרש:</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const template = '\ufeff' +
+                        'שם,טלפון,כמות,קטגוריה,הערות\n' +
+                        'דני כהן,0501234567,2,משפחה,\n' +
+                        'שרה לוי,0521234567,1,חברים,\n' +
+                        'ישראל ישראלי,0541234567,3,עבודה,הגיעו ב-19:00\n' +
+                        'מיכל גולן,0531234567,2,אחר,\n'
+                      const blob = new Blob([template], { type: 'text/csv;charset=utf-8' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url; a.download = 'תבנית_מוזמנים.csv'; a.click()
+                      URL.revokeObjectURL(url)
+                    }}
+                    className="flex items-center gap-1.5 text-xs text-champagne-600 font-hebrew font-semibold hover:text-champagne-700 bg-champagne-50 border border-champagne-200 px-2.5 py-1 rounded-lg"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    הורד תבנית
+                  </button>
                 </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs font-hebrew border-collapse">
+                    <thead>
+                      <tr>
+                        {['שם', 'טלפון', 'כמות', 'קטגוריה', 'הערות'].map(h => (
+                          <th key={h} className="bg-champagne-100 text-champagne-800 font-bold px-2 py-1.5 border border-champagne-200 text-right">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        ['דני כהן', '0501234567', '2', 'משפחה', ''],
+                        ['שרה לוי', '0521234567', '1', 'חברים', ''],
+                      ].map((row, i) => (
+                        <tr key={i} className="bg-white">
+                          {row.map((cell, j) => (
+                            <td key={j} className="px-2 py-1 border border-stone-100 text-stone-600">{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-stone-400 font-hebrew">
+                  * קטגוריה: <span className="font-semibold">משפחה / חברים / עבודה / אחר</span>
+                </p>
               </div>
 
               {/* Source options */}
@@ -342,9 +382,31 @@ export default function GuestsPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    const id = localStorage.getItem('activeEventId') || ''
-    setEventId(id)
-    if (id) loadGuests(id)
+    const init = async () => {
+      let id = localStorage.getItem('activeEventId') || ''
+      if (!id) {
+        // Fallback: fetch first event from DB (handles navigation race with layout)
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: events } = await supabase
+            .from('events').select('id')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+          if (events?.[0]) {
+            id = events[0].id
+            localStorage.setItem('activeEventId', id)
+          }
+        }
+      }
+      if (id) {
+        setEventId(id)
+        loadGuests(id)
+      } else {
+        setLoading(false)
+      }
+    }
+    init()
   }, [])
 
   const loadGuests = async (id?: string) => {
