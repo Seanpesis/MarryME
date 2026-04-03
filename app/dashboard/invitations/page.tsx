@@ -179,13 +179,11 @@ export default function InvitationsPage() {
     const selected = guests.filter(g => selectedGuests.has(g.id))
     let successCount = 0
     let failCount = 0
-    const eventSlug = event.id.substring(0, 8)
-
     for (let i = 0; i < selected.length; i++) {
       const guest = selected[i]
 
       // Guest-specific RSVP link so the system knows who responded
-      const rsvpLink = `${window.location.origin}/event/${eventSlug}?guest=${guest.id}`
+      const rsvpLink = `${window.location.origin}/event/${event.id}?guest=${guest.id}`
 
       // Build personalized message
       const msg = (customMessage || template.preview)

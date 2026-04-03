@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: event } = await supabase
     .from('events')
     .select('name, bride_name, groom_name, date, venue')
-    .ilike('id', `${params.slug}%`)
+    .eq('id', params.slug)
     .single()
 
   if (!event) return { title: 'אירוע' }
@@ -35,7 +35,7 @@ export default async function PublicEventPage({ params }: Props) {
   const { data: event } = await supabase
     .from('events')
     .select('*')
-    .ilike('id', `${params.slug}%`)
+    .eq('id', params.slug)
     .single()
 
   if (!event) notFound()

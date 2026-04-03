@@ -82,7 +82,7 @@ export default function EventSitePage() {
     loadEvent(event.id)
   }
 
-  const siteUrl = event && appUrl ? `${appUrl}/event/${event.id.substring(0, 8)}` : ''
+  const siteUrl = event && appUrl ? `${appUrl}/event/${event.id}` : ''
 
   const handleCopy = () => {
     navigator.clipboard.writeText(siteUrl)
