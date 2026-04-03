@@ -98,21 +98,31 @@ export function RealtimeProvider({ children, eventId }: { children: ReactNode; e
   )
 }
 
-// Realtime status indicator component
+// Realtime status indicator — self-contained, no provider needed
 export function RealtimeIndicator() {
-  const { isConnected, stats } = useRealtimeStats()
+  const [isConnected, setIsConnected] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    const eventId = localStorage.getItem('activeEventId')
+    if (!eventId) return
+
+    const channel = supabase
+      .channel(`indicator-${eventId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'guests', filter: `event_id=eq.${eventId}` }, () => {})
+      .subscribe((status) => {
+        setIsConnected(status === 'SUBSCRIBED')
+      })
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   return (
-    <div className="flex items-center gap-2 text-xs font-hebrew" title={isConnected ? 'מחובר בזמן אמת' : 'לא מחובר'}>
-      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-sage-500 animate-pulse' : 'bg-stone-300'}`} />
-      <span className={isConnected ? 'text-sage-600' : 'text-stone-400'}>
+    <div className="flex items-center gap-2 text-xs font-hebrew" title={isConnected ? 'מחובר בזמן אמת' : 'מתחבר...'}>
+      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-sage-500 animate-pulse' : 'bg-amber-400 animate-pulse'}`} />
+      <span className={isConnected ? 'text-sage-600' : 'text-amber-500'}>
         {isConnected ? 'עדכונים בזמן אמת' : 'מתחבר...'}
       </span>
-      {stats.lastUpdate && (
-        <span className="text-stone-300">
-          {stats.lastUpdate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
-        </span>
-      )}
     </div>
   )
 }

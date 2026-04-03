@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (!user) { router.push('/auth/login'); return }
       setUser(user)
 
-      // Load first event
+      // Load first event — re-runs on every navigation to stay in sync
       const { data: events } = await supabase
         .from('events')
         .select('*')
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
     loadUser()
-  }, [])
+  }, [pathname])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -90,16 +90,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-5 border-b border-stone-100">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <svg viewBox="0 0 36 36" fill="none" className="w-9 h-9 group-hover:scale-110 transition-transform duration-200">
-                <circle cx="13" cy="18" r="9" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5"/>
-                <circle cx="23" cy="18" r="9" fill="none" stroke="url(#logoGrad)" strokeWidth="2.5"/>
-                <path d="M18 24 C14.5 20.5 11 17 13.8 14.2 C15.4 12.6 18 14 18 14 C18 14 20.6 12.6 22.2 14.2 C25 17 21.5 20.5 18 24Z" fill="url(#logoGrad)"/>
+              <svg viewBox="0 0 36 36" fill="none" className="w-9 h-9 group-hover:scale-110 transition-transform duration-200" suppressHydrationWarning>
                 <defs>
-                  <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <linearGradient id="dashLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#e4aa4e"/>
                     <stop offset="100%" stopColor="#a35c19"/>
                   </linearGradient>
                 </defs>
+                <circle cx="13" cy="18" r="9" fill="none" stroke="url(#dashLogoGrad)" strokeWidth="2.5"/>
+                <circle cx="23" cy="18" r="9" fill="none" stroke="url(#dashLogoGrad)" strokeWidth="2.5"/>
+                <path d="M18 24 C14.5 20.5 11 17 13.8 14.2 C15.4 12.6 18 14 18 14 C18 14 20.6 12.6 22.2 14.2 C25 17 21.5 20.5 18 24Z" fill="url(#dashLogoGrad)"/>
               </svg>
             </div>
             <span className="font-display text-[22px] font-bold text-dark-brown tracking-tight">MarryME</span>

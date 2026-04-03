@@ -259,6 +259,15 @@ function VendorCard({ vendor, eventId, onAddExpense }: { vendor: Vendor; eventId
       <div className="flex gap-2 mt-auto">
         {vendor.phone && (
           <a
+            href={`tel:${vendor.phone}`}
+            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-sage-50 border border-sage-200 text-sage-700 text-xs font-hebrew hover:bg-sage-100 transition-colors"
+            title="התקשר"
+          >
+            <Phone className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {vendor.phone && (
+          <a
             href={`https://wa.me/972${vendor.phone.replace(/^0/, '').replace(/\D/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"

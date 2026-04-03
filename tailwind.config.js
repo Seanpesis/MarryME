@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       fontFamily: {
         'display': ['var(--font-playfair)', 'Georgia', 'serif'],
-        'body': ['var(--font-jakarta)', 'sans-serif'],
-        'hebrew': ['var(--font-heebo)', 'var(--font-jakarta)', 'sans-serif'],
+        'body': ['var(--font-rubik)', 'sans-serif'],
+        'hebrew': ['var(--font-rubik)', 'sans-serif'],
       },
       colors: {
         champagne: {

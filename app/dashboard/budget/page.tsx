@@ -58,12 +58,13 @@ function ExpenseModal({ expense, categories, eventId, onClose, onSaved }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-5 border-b border-stone-100 flex items-center justify-between">
+      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-md flex flex-col max-h-[90vh]">
+        <div className="shrink-0 p-5 border-b border-stone-100 flex items-center justify-between">
           <h2 className="font-bold text-dark-brown font-hebrew text-lg">{expense?.id ? 'עריכת הוצאה' : 'הוספת הוצאה'}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="w-5 h-5" /></button>
         </div>
-        <form onSubmit={handleSave} className="p-5 space-y-4">
+        <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           <div>
             <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">תיאור *</label>
             <input type="text" value={form.description} onChange={e => update('description', e.target.value)} required className="input-field" placeholder="כלה צלם, תשלום ראשון..." />
@@ -110,11 +111,12 @@ function ExpenseModal({ expense, categories, eventId, onClose, onSaved }: any) {
             <textarea value={form.notes} onChange={e => update('notes', e.target.value)} className="input-field resize-none" rows={2} />
           </div>
 
-          <div className="flex gap-3 pt-1">
+        </div>
+        <div className="shrink-0 border-t border-stone-100 p-5 flex gap-3">
             <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">ביטול</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-              שמור
+              <span>שמור</span>
             </button>
           </div>
         </form>
@@ -149,12 +151,13 @@ function IncomeModal({ income, eventId, onClose, onSaved }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-luxury w-full max-w-sm">
-        <div className="p-5 border-b border-stone-100 flex items-center justify-between">
+      <div className="bg-white rounded-2xl shadow-luxury w-full max-w-sm flex flex-col max-h-[90vh]">
+        <div className="shrink-0 p-5 border-b border-stone-100 flex items-center justify-between">
           <h2 className="font-bold text-dark-brown font-hebrew">{income?.id ? 'עריכת הכנסה' : 'הוספת הכנסה'}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="w-5 h-5" /></button>
         </div>
-        <form onSubmit={handleSave} className="p-5 space-y-4">
+        <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           <div>
             <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">מקור</label>
             <input type="text" value={form.source} onChange={e => update('source', e.target.value)} required className="input-field" placeholder="מתנות, הורי הכלה..." />
@@ -171,11 +174,12 @@ function IncomeModal({ income, eventId, onClose, onSaved }: any) {
             <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">הערות</label>
             <textarea value={form.notes} onChange={e => update('notes', e.target.value)} className="input-field resize-none" rows={2} />
           </div>
-          <div className="flex gap-3">
+        </div>
+        <div className="shrink-0 border-t border-stone-100 p-5 flex gap-3">
             <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">ביטול</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-              שמור
+              <span>שמור</span>
             </button>
           </div>
         </form>

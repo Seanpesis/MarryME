@@ -223,64 +223,74 @@ function TableModal({ table, eventId, onClose, onSaved }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-md">
-        <div className="p-5 border-b border-stone-100 flex items-center justify-between">
+      {/* Modal — flex column so header + footer stay visible, body scrolls */}
+      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-md flex flex-col max-h-[90vh]">
+        {/* Sticky header */}
+        <div className="p-5 border-b border-stone-100 flex items-center justify-between shrink-0">
           <h2 className="font-display text-xl font-bold text-dark-brown">{table?.id ? 'עריכת שולחן' : 'שולחן חדש'}</h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="w-5 h-5" /></button>
+          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="w-5 h-5" /></button>
         </div>
-        <form onSubmit={handleSave} className="p-5 space-y-4">
-          <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם השולחן *</label>
-            <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required className="input-field" placeholder="שולחן 1" />
-          </div>
 
-          <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">מספר כיסאות</label>
-            <input
-              type="number" value={form.capacity}
-              onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
-              min="1" max="30" className="input-field" dir="ltr"
-            />
-          </div>
+        {/* Scrollable body */}
+        <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם השולחן *</label>
+              <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required className="input-field" placeholder="שולחן 1" />
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-2">צורת השולחן</label>
-            <div className="grid grid-cols-4 gap-2">
-              {SHAPES.map(({ value, label, icon: Icon }) => (
-                <button
-                  key={value} type="button"
-                  onClick={() => setForm(f => ({ ...f, shape: value }))}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
-                    form.shape === value
-                      ? 'border-champagne-500 bg-champagne-50 text-champagne-700'
-                      : 'border-stone-200 hover:border-champagne-300 text-stone-500'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-hebrew font-semibold">{label}</span>
-                </button>
-              ))}
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">מספר כיסאות</label>
+              <input
+                type="number" value={form.capacity}
+                onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
+                min="1" max="30" className="input-field" dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-2">צורת השולחן</label>
+              <div className="grid grid-cols-4 gap-2">
+                {SHAPES.map(({ value, label, icon: Icon }) => (
+                  <button
+                    key={value} type="button"
+                    onClick={() => setForm(f => ({ ...f, shape: value }))}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
+                      form.shape === value
+                        ? 'border-champagne-500 bg-champagne-50 text-champagne-700'
+                        : 'border-stone-200 hover:border-champagne-300 text-stone-500'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-xs font-hebrew font-semibold">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview — capped height so it doesn't push buttons off screen */}
+            <div className="bg-stone-50 rounded-2xl p-3">
+              <p className="text-xs text-stone-400 font-hebrew text-center mb-1">תצוגה מקדימה</p>
+              <div className="max-h-36 overflow-hidden">
+                <TableVisual
+                  table={{ ...form, id: 'preview', capacity: parseInt(form.capacity) || 8 }}
+                  tableGuests={[]}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">הערות</label>
+              <input type="text" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="input-field" placeholder="הערות אופציונליות" />
             </div>
           </div>
 
-          {/* Preview */}
-          <div className="bg-stone-50 rounded-2xl p-3">
-            <p className="text-xs text-stone-400 font-hebrew text-center mb-2">תצוגה מקדימה</p>
-            <TableVisual
-              table={{ ...form, id: 'preview', capacity: parseInt(form.capacity) || 8 }}
-              tableGuests={[]}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">הערות</label>
-            <input type="text" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="input-field" placeholder="הערות אופציונליות" />
-          </div>
-
-          <div className="flex gap-3 pt-1">
+          {/* Sticky footer — always visible regardless of scroll position */}
+          <div className="shrink-0 border-t border-stone-100 p-5 flex gap-3">
             <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">ביטול</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}שמור
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              <span>שמור</span>
             </button>
           </div>
         </form>
@@ -314,12 +324,12 @@ function BulkCreateModal({ eventId, onClose, onCreated }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-sm">
-        <div className="p-5 border-b border-stone-100 flex items-center justify-between">
+      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-sm flex flex-col max-h-[90vh]">
+        <div className="shrink-0 p-5 border-b border-stone-100 flex items-center justify-between">
           <h2 className="font-display text-xl font-bold text-dark-brown">יצירת שולחנות בכמות</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100"><X className="w-5 h-5" /></button>
         </div>
-        <div className="p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           <div>
             <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">קידומת שם</label>
             <input type="text" value={prefix} onChange={e => setPrefix(e.target.value)} className="input-field" />
@@ -351,13 +361,13 @@ function BulkCreateModal({ eventId, onClose, onCreated }: any) {
           <div className="bg-champagne-50 rounded-xl p-3 text-xs font-hebrew text-champagne-700">
             ייצור: {prefix} 1 עד {prefix} {count} — {capacity} כיסאות כל שולחן
           </div>
-          <div className="flex gap-3">
+        </div>
+        <div className="shrink-0 border-t border-stone-100 p-5 flex gap-3">
             <button onClick={onClose} className="btn-secondary flex-1 justify-center">ביטול</button>
             <button onClick={handleCreate} disabled={loading} className="btn-primary flex-1 justify-center">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}צור
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}<span>צור</span>
             </button>
           </div>
-        </div>
       </div>
     </div>
   )

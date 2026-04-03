@@ -67,7 +67,15 @@ export default function EventSitePage() {
   const handleSave = async () => {
     if (!event) return
     setSaving(true)
-    const { error } = await supabase.from('events').update(form).eq('id', event.id)
+    // Auto-update event name if it was auto-generated from bride/groom names
+    const autoName = (form.bride_name && form.groom_name)
+      ? `חתונת ${form.bride_name} ו${form.groom_name}`
+      : null
+    const payload: any = { ...form }
+    if (autoName && (!event.name || event.name.startsWith('חתונת '))) {
+      payload.name = autoName
+    }
+    const { error } = await supabase.from('events').update(payload).eq('id', event.id)
     if (error) { toast.error('שגיאה בשמירה'); setSaving(false); return }
     toast.success('האתר עודכן ✓')
     setSaving(false)

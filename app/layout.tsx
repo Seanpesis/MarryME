@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Plus_Jakarta_Sans, Heebo } from 'next/font/google'
+import { Playfair_Display, Rubik } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400','500','600','700','800','900'], variable: '--font-playfair', display: 'swap' })
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['300','400','500','600','700','800'], variable: '--font-jakarta', display: 'swap' })
-const heebo = Heebo({ subsets: ['hebrew', 'latin'], weight: ['300','400','500','600','700','800'], variable: '--font-heebo', display: 'swap' })
+const rubik = Rubik({ subsets: ['hebrew', 'latin'], weight: ['300','400','500','600','700','800','900'], variable: '--font-rubik', display: 'swap' })
 
 export const viewport: Viewport = {
   themeColor: '#dc9229',
@@ -29,14 +28,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${playfair.variable} ${jakarta.variable} ${heebo.variable} font-hebrew antialiased`}>
+      <body className={`${playfair.variable} ${rubik.variable} font-hebrew antialiased`}>
         {children}
         <Toaster
           position="top-center"
           toastOptions={{
             duration: 3500,
             style: {
-              fontFamily: 'var(--font-heebo)', direction: 'rtl',
+              fontFamily: 'var(--font-rubik)', direction: 'rtl',
               background: '#1a0f0a', color: '#faf8f5',
               border: '1px solid rgba(220,146,41,0.3)', borderRadius: '16px', padding: '12px 20px',
             },

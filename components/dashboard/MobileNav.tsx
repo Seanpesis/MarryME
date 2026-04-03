@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BarChart3, Users, MessageCircle, DollarSign, LayoutGrid } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 const MOBILE_NAV = [
   { href: '/dashboard', icon: BarChart3, label: 'בקרה', exact: true },
@@ -14,9 +15,14 @@ const MOBILE_NAV = [
 
 export function MobileBottomNav() {
   const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
 
-  const isActive = (href: string, exact?: boolean) =>
-    exact ? pathname === href : pathname.startsWith(href)
+  useEffect(() => { setMounted(true) }, [])
+
+  const isActive = (href: string, exact?: boolean) => {
+    if (!mounted) return false
+    return exact ? pathname === href : pathname.startsWith(href)
+  }
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-100 lg:hidden safe-area-pb">
@@ -28,9 +34,7 @@ export function MobileBottomNav() {
               key={href}
               href={href}
               className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all min-w-0 ${
-                active
-                  ? 'text-champagne-600'
-                  : 'text-stone-400 hover:text-stone-600'
+                active ? 'text-champagne-600' : 'text-stone-400 hover:text-stone-600'
               }`}
             >
               <div className={`relative p-1.5 rounded-xl transition-all ${active ? 'bg-champagne-100' : ''}`}>

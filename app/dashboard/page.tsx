@@ -7,7 +7,7 @@ import {
   Plus, Users, CheckCircle2, Clock, XCircle, MessageCircle,
   DollarSign, LayoutGrid, Calendar, MapPin, Loader2, Edit2,
   TrendingUp, AlertTriangle, Sparkles, Heart, FileText,
-  Globe, Search, Bell, ChevronRight, Zap
+  Globe, Search, Bell, ChevronRight, Zap, Check
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase-client'
@@ -252,6 +252,170 @@ function QuickAction({ href, icon, label, color, badge }: {
   )
 }
 
+/* ─────────────────── EDIT EVENT MODAL ─────────────────── */
+function EditEventModal({ event, onClose, onSaved }: { event: any; onClose: () => void; onSaved: (ev: any) => void }) {
+  const [form, setForm] = useState({
+    name: event.name || '',
+    bride_name: event.bride_name || '',
+    groom_name: event.groom_name || '',
+    date: event.date || '',
+    venue: event.venue || '',
+    venue_address: event.venue_address || '',
+    total_budget: String(event.total_budget || ''),
+  })
+  const [loading, setLoading] = useState(false)
+  const [venueSearch, setVenueSearch] = useState('')
+  const [showVenuePicker, setShowVenuePicker] = useState(false)
+  const [selectedRegion, setSelectedRegion] = useState<string>('הכל')
+  const supabase = createClient()
+  const u = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  const filteredVenues = ISRAEL_VENUES.filter(v => {
+    const matchRegion = selectedRegion === 'הכל' || v.region === selectedRegion
+    const matchSearch = !venueSearch || v.name.includes(venueSearch) || v.city.includes(venueSearch) || v.address.includes(venueSearch)
+    return matchRegion && matchSearch
+  })
+
+  const handleSelectVenue = (venue: Venue) => {
+    setForm(f => ({ ...f, venue: venue.name, venue_address: venue.address }))
+    setShowVenuePicker(false)
+    setVenueSearch('')
+  }
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    const payload = {
+      name: form.name || (form.bride_name && form.groom_name ? `חתונת ${form.bride_name} ו${form.groom_name}` : event.name),
+      bride_name: form.bride_name,
+      groom_name: form.groom_name,
+      date: form.date,
+      venue: form.venue,
+      venue_address: form.venue_address,
+      total_budget: parseFloat(form.total_budget) || 0,
+    }
+    const { data, error } = await supabase.from('events').update(payload).eq('id', event.id).select().single()
+    if (error) { toast.error('שגיאה בעדכון האירוע'); setLoading(false); return }
+    toast.success('האירוע עודכן ✓')
+    onSaved(data)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
+      <div className="bg-white rounded-3xl shadow-luxury w-full max-w-lg flex flex-col max-h-[92vh]">
+        <div className="shrink-0 p-6 border-b border-stone-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-champagne-400 to-champagne-600 rounded-xl flex items-center justify-center">
+              <Edit2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl font-bold text-dark-brown">עריכת האירוע</h2>
+              <p className="text-stone-500 text-sm font-hebrew">עדכנו את פרטי האירוע שלכם</p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם הכלה 👰</label>
+                <input type="text" value={form.bride_name} onChange={e => u('bride_name', e.target.value)} placeholder="יעל" className="input-field" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם החתן 🤵</label>
+                <input type="text" value={form.groom_name} onChange={e => u('groom_name', e.target.value)} placeholder="אורי" className="input-field" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">שם האירוע</label>
+              <input type="text" value={form.name} onChange={e => u('name', e.target.value)}
+                placeholder={form.bride_name && form.groom_name ? `חתונת ${form.bride_name} ו${form.groom_name}` : 'שם האירוע'}
+                className="input-field" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">
+                <Calendar className="w-4 h-4 inline ml-1" />תאריך האירוע *
+              </label>
+              <input type="date" value={form.date} onChange={e => u('date', e.target.value)} required className="input-field" />
+            </div>
+
+            {/* Venue Picker */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-semibold font-hebrew text-stone-700">
+                  <MapPin className="w-4 h-4 inline ml-1" />מקום האירוע
+                </label>
+                <button type="button" onClick={() => setShowVenuePicker(v => !v)}
+                  className="text-xs text-champagne-600 font-hebrew font-semibold hover:text-champagne-700 underline">
+                  {showVenuePicker ? 'סגור רשימה' : '🗺️ בחר מרשימת אולמות ישראל'}
+                </button>
+              </div>
+              {showVenuePicker && (
+                <div className="mb-3 border border-champagne-200 rounded-2xl overflow-hidden bg-champagne-50/30">
+                  <div className="p-3 border-b border-champagne-100 space-y-2">
+                    <input type="text" value={venueSearch} onChange={e => setVenueSearch(e.target.value)}
+                      placeholder="חפש אולם לפי שם או עיר..." className="input-field py-2 text-sm" autoFocus />
+                    <div className="flex gap-1.5 flex-wrap">
+                      {['הכל', ...VENUE_REGIONS].map(r => (
+                        <button key={r} type="button" onClick={() => setSelectedRegion(r)}
+                          className={`text-xs px-2.5 py-1 rounded-full font-hebrew font-semibold transition-colors ${
+                            selectedRegion === r ? 'bg-champagne-500 text-white' : 'bg-white border border-stone-200 text-stone-600 hover:border-champagne-300'
+                          }`}>{r}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="max-h-40 overflow-y-auto">
+                    {filteredVenues.length === 0 ? (
+                      <p className="text-center text-stone-400 font-hebrew text-sm py-4">לא נמצאו אולמות</p>
+                    ) : filteredVenues.map(venue => (
+                      <button key={venue.id} type="button" onClick={() => handleSelectVenue(venue)}
+                        className="w-full flex items-start gap-3 px-4 py-3 hover:bg-champagne-50 transition-colors text-right border-b border-stone-50 last:border-0">
+                        <div className="w-8 h-8 rounded-lg bg-champagne-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <MapPin className="w-4 h-4 text-champagne-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-dark-brown font-hebrew text-sm">{venue.name}</p>
+                          <p className="text-xs text-stone-500 font-hebrew truncate">{venue.city} · {venue.address}</p>
+                          <p className="text-xs text-champagne-600 font-hebrew">{venue.phone} · {venue.capacity} אורחים</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <input type="text" value={form.venue} onChange={e => u('venue', e.target.value)} placeholder="שם האולם" className="input-field" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">כתובת לניווט</label>
+              <input type="text" value={form.venue_address} onChange={e => u('venue_address', e.target.value)}
+                placeholder="רחוב הורד 12, כפר סבא" className="input-field" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold font-hebrew text-stone-700 mb-1.5">
+                <DollarSign className="w-4 h-4 inline ml-1" />תקציב כולל (₪)
+              </label>
+              <input type="number" value={form.total_budget} onChange={e => u('total_budget', e.target.value)} placeholder="120000" min="0" className="input-field" dir="ltr" />
+            </div>
+          </div>
+
+          <div className="shrink-0 border-t border-stone-100 p-6 flex gap-3">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">ביטול</button>
+            <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              <span>{loading ? 'שומר...' : 'שמור שינויים'}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 /* ─────────────────── ACTIVITY FEED ─────────────────── */
 function ActivityItem({ icon, text, time, color }: { icon: string; text: string; time: string; color: string }) {
   return (
@@ -273,6 +437,7 @@ export default function DashboardPage() {
   const [recentActivity, setRecentActivity] = useState<any[]>([])
   const [rsvpTrend, setRsvpTrend] = useState<any[]>([])
   const [showCreate, setShowCreate] = useState(false)
+  const [showEdit, setShowEdit] = useState(false)
   const [loading, setLoading] = useState(true)
   const [tableCount, setTableCount] = useState(0)
   const supabase = createClient()
@@ -424,6 +589,13 @@ export default function DashboardPage() {
           onCreated={(ev) => { setEvent(ev); setShowCreate(false); loadData() }}
         />
       )}
+      {showEdit && event && (
+        <EditEventModal
+          event={event}
+          onClose={() => setShowEdit(false)}
+          onSaved={(ev) => { setEvent(ev); setShowEdit(false); loadData() }}
+        />
+      )}
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
 
@@ -468,7 +640,7 @@ export default function DashboardPage() {
                 </div>
               )}
               <button
-                onClick={() => setShowCreate(true)}
+                onClick={() => setShowEdit(true)}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-sm font-hebrew hover:bg-white/20 transition-colors"
               >
                 <Edit2 className="w-4 h-4" />
